@@ -1434,6 +1434,163 @@ img { max-width: 100%; }
   text-align: left;
   word-break: keep-all;
 }
+/* ============================================================
+   DIAGNOSIS（向いてる？診断）
+   ============================================================ */
+.diagnosis-wrap {
+  margin-top: 4rem;
+  background: rgba(110,31,42,0.04);
+  border: 1px solid rgba(201,169,110,0.25);
+  border-top: 2px solid var(--gold);
+  padding: 2.5rem 2rem;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.diagnosis-intro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.diagnosis-intro-title {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  color: var(--bordeaux);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+.diagnosis-intro-sub {
+  font-size: 0.85rem;
+  color: rgba(15,15,16,0.55);
+  letter-spacing: 0.05em;
+}
+.diagnosis-progress {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.diagnosis-progress-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(201,169,110,0.2);
+  transition: background 0.3s;
+}
+.diagnosis-progress-dot.active { background: var(--gold); }
+.diagnosis-progress-dot.done { background: var(--bordeaux); }
+.diagnosis-screen { display: none; }
+.diagnosis-screen.active { display: block; }
+.diagnosis-q-num {
+  font-family: var(--serif);
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+.diagnosis-q-text {
+  font-family: var(--serif-jp);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--black);
+  letter-spacing: 0.06em;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.diagnosis-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.diagnosis-choice {
+  background: transparent;
+  border: 1px solid rgba(201,169,110,0.35);
+  padding: 0.9em 1.5em;
+  font-family: var(--serif-jp);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  color: var(--black);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+  text-align: left;
+  width: 100%;
+  border-radius: 2px;
+}
+.diagnosis-choice:hover {
+  background: rgba(201,169,110,0.1);
+  border-color: var(--gold);
+}
+.diagnosis-choice.selected {
+  background: rgba(110,31,42,0.08);
+  border-color: var(--bordeaux);
+  color: var(--bordeaux);
+}
+/* 結果画面 */
+.diagnosis-result { text-align: center; }
+.diagnosis-result-badge {
+  display: inline-block;
+  background: var(--bordeaux);
+  color: var(--cream);
+  font-family: var(--serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  padding: 0.3em 1.2em;
+  margin-bottom: 1rem;
+}
+.diagnosis-result-type {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--bordeaux);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.8rem;
+  line-height: 1.4;
+}
+.diagnosis-result-desc {
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  color: rgba(15,15,16,0.7);
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  margin-bottom: 2rem;
+}
+.diagnosis-result-cta {
+  display: inline-block;
+  background: var(--bordeaux);
+  color: var(--cream);
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  padding: 1em 2.5em;
+  text-decoration: none;
+  transition: opacity 0.3s;
+  margin-bottom: 1rem;
+}
+.diagnosis-result-cta:hover { opacity: 0.85; }
+.diagnosis-retry {
+  display: block;
+  font-size: 0.78rem;
+  color: rgba(15,15,16,0.45);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  margin-top: 0.8rem;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.diagnosis-retry:hover { color: var(--bordeaux); }
+/* night theme */
+body.theme-night .diagnosis-wrap {
+  background: rgba(201,169,110,0.04);
+  border-color: rgba(201,169,110,0.2);
+}
+body.theme-night .diagnosis-intro-title { color: var(--gold); }
+body.theme-night .diagnosis-q-text { color: rgba(246,239,227,0.9); }
+body.theme-night .diagnosis-choice { color: rgba(246,239,227,0.8); border-color: rgba(201,169,110,0.25); }
+body.theme-night .diagnosis-choice:hover { background: rgba(201,169,110,0.08); border-color: var(--gold); color: var(--gold); }
+body.theme-night .diagnosis-choice.selected { background: rgba(201,169,110,0.1); border-color: var(--gold); color: var(--gold); }
+body.theme-night .diagnosis-result-type { color: var(--gold); }
+body.theme-night .diagnosis-result-desc { color: rgba(246,239,227,0.7); }
+body.theme-night .diagnosis-intro-sub { color: rgba(246,239,227,0.45); }
+body.theme-night .diagnosis-retry { color: rgba(246,239,227,0.35); }
+
 /* night theme overrides */
 body.theme-night .worry-bubble {
   background: rgba(246,239,227,0.04);
@@ -2413,8 +2570,89 @@ body.theme-night .prism-line-short {
           初めての配信でも、安心してスタートできる環境を整えています。
         </p>
       </div>
+
+    <!-- 診断コンテンツ -->
+    <div class="diagnosis-wrap fade-in" style="margin-top:4rem;">
+      <div class="diagnosis-intro">
+        <p class="diagnosis-intro-title">✦ あなたはBUTAIに向いている？ ✦</p>
+        <p class="diagnosis-intro-sub">5つの質問に答えて、あなたのタイプを診断しましょう</p>
+      </div>
+      <div class="diagnosis-progress" id="diag-progress">
+        <div class="diagnosis-progress-dot active" id="dp0"></div>
+        <div class="diagnosis-progress-dot" id="dp1"></div>
+        <div class="diagnosis-progress-dot" id="dp2"></div>
+        <div class="diagnosis-progress-dot" id="dp3"></div>
+        <div class="diagnosis-progress-dot" id="dp4"></div>
+      </div>
+
+      <!-- Q1 -->
+      <div class="diagnosis-screen active" id="diag-q0">
+        <p class="diagnosis-q-num">Q1 / 5</p>
+        <p class="diagnosis-q-text">配信活動をどんな位置づけで考えていますか？</p>
+        <div class="diagnosis-choices">
+          <button class="diagnosis-choice" onclick="diagAnswer(0,0)">🌱 まずは副業・お小遣い稼ぎから始めたい</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(0,1)">🔥 ゆくゆくは本業にしたいと思っている</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(0,2)">💫 とにかく自分を表現したい・楽しみたい</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="diagnosis-screen" id="diag-q1">
+        <p class="diagnosis-q-num">Q2 / 5</p>
+        <p class="diagnosis-q-text">今の生活スタイルに近いのは？</p>
+        <div class="diagnosis-choices">
+          <button class="diagnosis-choice" onclick="diagAnswer(1,0)">🏢 会社員・パート・アルバイトをしている</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(1,1)">🏠 育児・家事が中心の生活をしている</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(1,2)">📚 学生・もしくは特に決まっていない</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="diagnosis-screen" id="diag-q2">
+        <p class="diagnosis-q-num">Q3 / 5</p>
+        <p class="diagnosis-q-text">配信でやってみたいことは？</p>
+        <div class="diagnosis-choices">
+          <button class="diagnosis-choice" onclick="diagAnswer(2,0)">💬 日常トーク・自分の話をしたい</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(2,1)">💄 美容・ファッション・ライフスタイルを発信したい</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(2,2)">🎵 歌・ダンス・パフォーマンスをしたい</button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="diagnosis-screen" id="diag-q3">
+        <p class="diagnosis-q-num">Q4 / 5</p>
+        <p class="diagnosis-q-text">顔出しについてはどう思いますか？</p>
+        <div class="diagnosis-choices">
+          <button class="diagnosis-choice" onclick="diagAnswer(3,0)">😊 顔出しOK、むしろ積極的にしたい</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(3,1)">🤔 できれば避けたい・バレたくない</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(3,2)">💭 まだ決めていない・相談したい</button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="diagnosis-screen" id="diag-q4">
+        <p class="diagnosis-q-num">Q5 / 5</p>
+        <p class="diagnosis-q-text">配信活動でいちばん不安なことは？</p>
+        <div class="diagnosis-choices">
+          <button class="diagnosis-choice" onclick="diagAnswer(4,0)">📱 何を話せばいいかわからない</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(4,1)">💰 本当に稼げるのか自信がない</button>
+          <button class="diagnosis-choice" onclick="diagAnswer(4,2)">⏰ 時間が取れるか心配</button>
+        </div>
+      </div>
+
+      <!-- 結果画面 -->
+      <div class="diagnosis-screen" id="diag-result">
+        <div class="diagnosis-result">
+          <div class="diagnosis-result-badge" id="result-badge">TYPE</div>
+          <p class="diagnosis-result-type" id="result-type"></p>
+          <p class="diagnosis-result-desc" id="result-desc"></p>
+          <a href="https://lin.ee/pgwER6s" target="_blank" rel="noopener" class="diagnosis-result-cta">公式LINEで無料相談する →</a>
+          <button class="diagnosis-retry" onclick="diagRetry()">もう一度診断する</button>
+        </div>
+      </div>
     </div>
 
+    </div>
   </div>
 </section>
 <div class="prism-line"></div>
@@ -2791,6 +3029,85 @@ window.addEventListener('scroll', () => {
 // ── Mobile nav ──
 const menuToggle = document.getElementById('menu-toggle');
 const mobileNav = document.getElementById('mobile-nav');
+
+/* ============================================================
+   DIAGNOSIS LOGIC
+   ============================================================ */
+const diagAnswers = [];
+const diagTypes = {
+  fukugyou: {
+    badge: '副業スタートタイプ',
+    type: '今の生活を守りながら\n自分のペースで輝ける',
+    desc: '仕事や家事・育児と両立しながら、無理なくスタートできるのがあなたの強みです。BUTAIでは副業・兼業での活動を全力サポート。あなたのライフスタイルに合わせた配信スタイルを一緒に設計します。'
+  },
+  hongyou: {
+    badge: '本業転換タイプ',
+    type: '配信で人生を\n大きく変えられる可能性大',
+    desc: '本業にしたいという強い意志があるあなたには、BUTAIの手厚いサポートが最大限に活きます。月収100万円以上を達成したライバーも、最初は普通の会社員でした。その一歩を、一緒に踏み出しましょう。'
+  },
+  hyougen: {
+    badge: '自己表現タイプ',
+    type: '個性と感性を武器に\n唯一無二の舞台へ',
+    desc: '「自分を表現したい」という気持ちこそ、最強のスタート地点です。BUTAIはあなたの個性を「七色の光」として磨き上げます。収益より先に「自分らしさ」を見つけたいあなたにぴったりの環境があります。'
+  },
+  mama: {
+    badge: 'ライフスタイルタイプ',
+    type: '育児・家事と両立できる\n新しい働き方',
+    desc: 'スキマ時間を活かして配信できるのがライバー活動の魅力。顔出しが不安でも大丈夫、匿名スタイルでの活動実績もあります。BUTAIのマネージャーが、あなたの状況に合わせて丁寧にサポートします。'
+  }
+};
+
+function diagAnswer(qIndex, choiceIndex) {
+  diagAnswers[qIndex] = choiceIndex;
+  const dots = document.querySelectorAll('.diagnosis-progress-dot');
+  dots[qIndex].classList.remove('active');
+  dots[qIndex].classList.add('done');
+
+  document.getElementById('diag-q' + qIndex).classList.remove('active');
+
+  if (qIndex < 4) {
+    const next = document.getElementById('diag-q' + (qIndex + 1));
+    next.classList.add('active');
+    dots[qIndex + 1].classList.add('active');
+  } else {
+    showDiagResult();
+  }
+}
+
+function showDiagResult() {
+  // タイプ判定ロジック
+  const q0 = diagAnswers[0]; // 0=副業 1=本業 2=表現
+  const q1 = diagAnswers[1]; // 0=会社員 1=育児 2=学生
+  const q3 = diagAnswers[3]; // 顔出し
+
+  let type;
+  if (q0 === 1) {
+    type = 'hongyou';
+  } else if (q1 === 1) {
+    type = 'mama';
+  } else if (q0 === 2) {
+    type = 'hyougen';
+  } else {
+    type = 'fukugyou';
+  }
+
+  const t = diagTypes[type];
+  document.getElementById('result-badge').textContent = t.badge;
+  document.getElementById('result-type').innerHTML = t.type.replace('\n', '<br>');
+  document.getElementById('result-desc').textContent = t.desc;
+
+  document.getElementById('diag-result').classList.add('active');
+}
+
+function diagRetry() {
+  diagAnswers.length = 0;
+  document.querySelectorAll('.diagnosis-screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.diagnosis-progress-dot').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i === 0) d.classList.add('active');
+  });
+  document.getElementById('diag-q0').classList.add('active');
+}
 const mobileNavClose = document.getElementById('mobile-nav-close');
 menuToggle?.addEventListener('click', () => mobileNav.classList.add('open'));
 mobileNavClose?.addEventListener('click', () => mobileNav.classList.remove('open'));
