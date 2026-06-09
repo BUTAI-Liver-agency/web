@@ -92,6 +92,9 @@ img { max-width: 100%; }
   opacity: 0.65;
   display: block;
   margin-top: 0.6rem;
+  text-align: center;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* ============================================================
@@ -560,6 +563,8 @@ img { max-width: 100%; }
   display: block;
   margin: 3rem 0 1rem;
   line-height: 1.8;
+  word-break: keep-all;
+  white-space: nowrap;
 }
 
 /* ============================================================
@@ -1418,12 +1423,16 @@ img { max-width: 100%; }
   color: var(--bordeaux);
   letter-spacing: 0.08em;
   margin-bottom: 1rem;
+  word-break: keep-all;
+  white-space: nowrap;
 }
 .worries-answer-body {
   font-size: clamp(0.85rem, 2vw, 1rem);
   color: rgba(15,15,16,0.75);
   line-height: 1.9;
   letter-spacing: 0.04em;
+  text-align: left;
+  word-break: keep-all;
 }
 /* night theme overrides */
 body.theme-night .worry-bubble {
@@ -2400,7 +2409,7 @@ body.theme-night .prism-line-short {
       <div class="worries-answer fade-in" style="margin-top:2rem;">
         <p class="worries-answer-title">すべて、マネージャーに相談できます。</p>
         <p class="worries-answer-body">
-          あなたの不安や疑問に、経験豊富なスタッフが親身に向き合います。<br>
+          あなたの不安や疑問に、経験豊富なスタッフが親身に向き合います。
           初めての配信でも、安心してスタートできる環境を整えています。
         </p>
       </div>
