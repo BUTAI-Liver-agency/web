@@ -47,3 +47,15 @@ BUTAI-backup-20260910.zipに元のindex.htmlとimgフォルダをそのまま保
 ## ファイル
 index.html・styles.css・script.js・img/ が公開用ファイルです。
 package.jsonとdev-server.mjsは、依存ライブラリなしでローカル表示を確認するための開発用です。
+
+
+## 2026-09-11 — BUTAI special experience
+
+- Added `special/index.html`, `special/special.css`, `special/special.js` and an LP entrance banner and navigation links.
+- Four chapters: voice, connection, possibility, and LINE consultation. Uses existing BUTAI portraits and brand colors.
+- Scroll-linked typography, portrait movement, and full-screen chapter backgrounds. Native scrolling and chapter anchors remain available. Reduced-motion settings and a manual motion control are supported.
+- Original 88 BPM ambient score synthesized with Web Audio (A minor / F / C / G colors, arpeggio, pad and bass). No KOKUYO artwork, code or audio copied. Starts only after an explicit gesture; mute, tab-hide suspension and no-audio fallback included.
+- KOKUYO reference loaded its entry/color screen, but a ReferenceError prevented full animation inspection in the available browser. Music was not auditioned; this is an original interpretation, not a reproduction.
+- Browser validation: desktop and 390px frame, no horizontal overflow; sound-start reported running, mute, motion toggle, chapter navigation, LP navigation. Audio has not been assessed by listening on physical devices. Existing LINE URL retained; no live registration performed.
+- Pre-special backup: `BUTAI-before-special-20260911.zip` from commit 75890a6. Original-site backup from 0779847630b27dc95a38aefc824bb1c8450f3fe5 remains preserved separately.
+- Publication remains blocked by the GitHub App integration write permission. This package is a local release, not a confirmed live deployment.

@@ -11,8 +11,9 @@ const host = flag('--host', '0.0.0.0');
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg' };
 http.createServer(async (req, res) => {
   try {
-    const relative = decodeURIComponent(new URL(req.url, 'http://localhost').pathname).replace(/^\/+/, '') || 'index.html';
-    if (!['index.html', 'styles.css', 'script.js'].includes(relative) && !/^img\/[a-z0-9_-]+\.(png|jpg)$/i.test(relative)) {
+    let relative = decodeURIComponent(new URL(req.url, 'http://localhost').pathname).replace(/^\/+/, '') || 'index.html';
+    if (relative === 'special/' || relative === 'special') relative = 'special/index.html';
+    if (!['index.html', 'styles.css', 'script.js', 'special/index.html', 'special/special.css', 'special/special.js'].includes(relative) && !/^img\/[a-z0-9_-]+\.(png|jpg)$/i.test(relative)) {
       res.writeHead(404); res.end('Not found'); return;
     }
     const data = await readFile(path.join(root, relative));
