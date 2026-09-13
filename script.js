@@ -26,58 +26,6 @@ window.matchMedia('(min-width: 761px)').addEventListener('change', event => {
   if (event.matches) closeMenu();
 });
 
-// Content is visible without JS. Reveals and scroll-linked motion are optional.
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const desktop = window.matchMedia('(min-width: 761px)');
-const story = document.querySelector('.story');
-const heroArt = document.querySelector('.hero-art');
-let scrollFrame = 0;
-let revealObserver;
-const clamp = value => Math.max(0, Math.min(1, value));
-function updateMotion() {
-  scrollFrame = 0;
-  if (reducedMotion.matches || !desktop.matches) {
-    story.style.setProperty('--progress', '1');
-    heroArt.style.setProperty('--progress', '0');
-    return;
-  }
-  const rect = story.getBoundingClientRect();
-  const travel = Math.max(1, rect.height - (window.innerHeight - 88));
-  story.style.setProperty('--progress', String(clamp((88 - rect.top) / travel)));
-  const hero = document.querySelector('.hero').getBoundingClientRect();
-  heroArt.style.setProperty('--progress', String(clamp(-hero.top / hero.height)));
-}
-function queueMotion() {
-  if (!scrollFrame) scrollFrame = requestAnimationFrame(updateMotion);
-}
-function configureMotion() {
-  revealObserver?.disconnect();
-  document.querySelectorAll('.reveal').forEach(el => el.classList.remove('pending'));
-  document.documentElement.classList.toggle('motion', !reducedMotion.matches);
-  if (!reducedMotion.matches && 'IntersectionObserver' in window) {
-    revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.remove('pending');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0, rootMargin: '0px 0px 24px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => {
-      if (el.getBoundingClientRect().top > window.innerHeight) {
-        el.classList.add('pending');
-        revealObserver.observe(el);
-      }
-    });
-  }
-  queueMotion();
-}
-window.addEventListener('scroll', queueMotion, { passive: true });
-window.addEventListener('resize', queueMotion, { passive: true });
-reducedMotion.addEventListener('change', configureMotion);
-desktop.addEventListener('change', queueMotion);
-configureMotion();
-
 // Five answers form a consultation note; no scoring, income claims or storage.
 const questions = [
   { label: '活動の希望', title: '配信を、どんなふうに始めたいですか？', choices: ['副業として始めたい', '将来は本業にしたい', 'まずは自己表現を楽しみたい', 'まだ決めていないので相談したい'] },
