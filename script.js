@@ -190,3 +190,13 @@ document.getElementById('copy-line').addEventListener('click', async () => {
 document.querySelectorAll('a[data-cta]').forEach(link => link.addEventListener('click', () => {
   document.dispatchEvent(new CustomEvent('butai:line_click', {detail:{placement:link.dataset.cta}}));
 }));
+
+// Lifestyle buttons prepare the relevant question before jumping to the helper.
+document.querySelectorAll('[data-life-topic]').forEach(link => link.addEventListener('click', () => {
+  const student = link.dataset.lifeTopic === 'student';
+  document.querySelectorAll('[data-topic]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.topic === 'balance')));
+  lineMessage.value = student
+    ? 'はじめまして。学校と配信を両立したいです。授業や試験の予定に合わせて活動できるか、必要な配信時間・頻度を教えてください。'
+    : 'はじめまして。仕事と配信を両立したいです。帰宅後や休日に活動できるか、必要な配信時間・頻度を教えてください。';
+  lineStatus.textContent = '相談用の文章を用意しました。コピーしてLINEに貼り付けてください。自由に編集できます。';
+}));
