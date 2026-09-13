@@ -161,3 +161,32 @@ document.getElementById('quiz-copy').addEventListener('click', async () => {
 document.getElementById('quiz-nojs').hidden = true;
 quiz.hidden = false;
 renderQuestion(false);
+
+// Optional first-message helper. Nothing is transmitted or persisted here.
+const topicMessages = {
+  beginner: 'はじめまして。配信は未経験です。BUTAIでの活動内容や、初めての配信までの流れを教えてください。',
+  balance: 'はじめまして。学校・仕事と配信を両立したいです。必要な配信時間や頻度、ノルマの有無を教えてください。',
+  experienced: 'はじめまして。配信経験があり、BUTAIへの所属を検討しています。所属条件やサポート内容について相談したいです。'
+};
+const lineMessage = document.getElementById('line-message');
+const lineStatus = document.getElementById('line-copy-status');
+document.querySelectorAll('[data-topic]').forEach(button => button.addEventListener('click', () => {
+  document.querySelectorAll('[data-topic]').forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+  lineMessage.value = topicMessages[button.dataset.topic];
+  lineStatus.textContent = '文章は自由に編集できます。コピーして、LINEのトークに貼り付けてください。';
+}));
+document.getElementById('copy-line').addEventListener('click', async () => {
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(lineMessage.value);
+    lineStatus.textContent = 'コピーしました。LINEを開き、トークに貼り付けて送信してください。';
+  } catch {
+    lineMessage.focus(); lineMessage.select();
+    lineStatus.textContent = '文章を選択しました。端末のコピー操作でコピーして、LINEに貼り付けてください。';
+  }
+});
+// Integration hook only: emits an anonymous location label, not message text.
+// No analytics service is connected; a CTA click is NOT a confirmed LINE add.
+document.querySelectorAll('a[data-cta]').forEach(link => link.addEventListener('click', () => {
+  document.dispatchEvent(new CustomEvent('butai:line_click', {detail:{placement:link.dataset.cta}}));
+}));
