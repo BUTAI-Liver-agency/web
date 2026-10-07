@@ -1,15 +1,7 @@
 import {DatabaseSync} from 'node:sqlite';
 import {createHmac,timingSafeEqual} from 'node:crypto';
-export const LINE='https://lin.ee/pgwER6s';
-export const normalize=s=>String(s).normalize('NFKC').trim().toLocaleLowerCase('ja');
-export function matches(text,c){const t=normalize(text);return c.keywords.some(k=>c.mode==='contains'?t.includes(normalize(k)):t===normalize(k));}
-export function campaign(input){
- const c={mediaId:String(input.mediaId||''),name:String(input.name||'').trim(),keywords:input.keywords,mode:input.mode||'exact',message:String(input.message||'').trim(),lineUrl:input.lineUrl||LINE,enabled:input.enabled===true};
- if(!/^\d{1,40}$/.test(c.mediaId)||!c.name||c.name.length>100||!Array.isArray(c.keywords)||!c.keywords.length||c.keywords.length>20||c.keywords.some(k=>typeof k!=='string'||!normalize(k)||k.length>100)||!['exact','contains'].includes(c.mode)||!c.message||c.message.length>800)throw Error('投稿ID・名前・キーワード・DM文章を確認してください');
- const u=new URL(c.lineUrl);if(u.protocol!=='https:'||!['lin.ee','line.me'].includes(u.hostname))throw Error('公式LINEのHTTPS URLを指定してください');
- return c;
-}
-export function message(c){return c.message.includes(c.lineUrl)?c.message:`${c.message}\n\nBUTAI公式LINEはこちら\n${c.lineUrl}`;}
+import {matches,message} from './domain.mjs';
+export {LINE,normalize,matches,campaign,message} from './domain.mjs';
 export function signature(raw,sig,secret){if(!secret||!/^sha256=[a-f0-9]{64}$/.test(sig||''))return false;return timingSafeEqual(Buffer.from(sig.slice(7),'hex'),createHmac('sha256',secret).update(raw).digest());}
 export class Store{
  constructor(path){this.db=new DatabaseSync(path);this.db.exec(`PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS campaigns(media_id TEXT PRIMARY KEY,data TEXT NOT NULL); CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY,media_id TEXT NOT NULL,text TEXT NOT NULL,state TEXT NOT NULL,created INTEGER NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,due INTEGER NOT NULL,detail TEXT NOT NULL DEFAULT ''); CREATE TABLE IF NOT EXISTS settings(id INTEGER PRIMARY KEY CHECK(id=1),enabled INTEGER NOT NULL); INSERT OR IGNORE INTO settings VALUES(1,0); UPDATE jobs SET state='uncertain',detail='再起動前の送信結果が不明。Instagramで確認してください' WHERE state='sending';`);}

@@ -4,11 +4,11 @@
 
 ## 現在の状態
 
-実装・ローカルの自動テストまで完了。サーバー公開とMeta/Instagram認証、実アカウントでの配送テストは未実施です。GitHub Pagesは静的ホスティングのため、このサーバーを実行できません。管理画面とWebhookはRender等のNodeサーバーで動かします。GitHub Actionsを常時サーバーの代用にしません。
+実装・ローカルの自動テストまで完了。サーバー公開とMeta/Instagram認証、実アカウントでの配送テストは未実施です。GitHub Pagesは静的ホスティングのため、このサーバーを実行できません。管理画面とWebhookはCloudflare Workersで動かします。GitHub Actionsを常時サーバーの代用にしません。
 
 ## ローカルで確認
 
-Node.js 24系。外部npm依存はありません。
+Node.js 24系。サーバー実行時の外部npm依存はありません。Cloudflare公開用の開発依存にWranglerを固定しています。
 
 ```sh
 cd instagram-dm
@@ -20,13 +20,11 @@ npm start
 
 http://localhost:3000/ を開き、ADMIN_TOKENでログイン。投稿ID（数字）を指定し、投稿別のキーワードとDMを保存。「送信前に確認」で文章と判定を試せます。確認操作は外部送信しません。APIトークン等をGitHubにコミットしないでください。
 
-## Renderへの接続（アカウント・料金確認が必要）
+## 推奨公開先：Cloudflare Free
 
-1. Renderで `BUTAI-Liver-agency/web` と `codex/butai-instagram-comment-dm` ブランチを接続。
-2. Blueprintのパスを `instagram-dm/render.yaml` に指定。サービス名は `butai-instagram-dm`。Blueprintパス指定に対応しない操作ではWeb Serviceを作り、Root Directory `instagram-dm`、Build `npm install --ignore-scripts`、Start `npm start`、Node 24、Health `/healthz` を設定。
-3. 永続ディスクを `/var/data` に付け、DATA_DIRも `/var/data` に設定。Starterとディスクは有料構成です。料金を確認してから作成。無料・一時ディスクでは再起動時に設定と重複防止記録を失うので本番運用しないでください。
-4. `.env.example` 相当の環境変数を設定。ADMIN_TOKENとMETA_VERIFY_TOKENはRender生成値を使用できます。認証情報は管理画面から設定できます。DBには暗号化して保存します。環境変数からの初期設定にも対応します。
-5. 公開URL `/` が管理画面、`/webhook` がMetaコールバック。GitHub PagesのURLではありません。単一インスタンスで運用してください。
+Cloudflare Workers + D1版を追加しました。無料版の公開手順と停止機能は [cloudflare/README.md](cloudflare/README.md) を参照してください。サーバー公開と実Instagram配送はまだ未実施です。
+
+管理画面はWorkersの公開URL `/`、Webhookは `/webhook` です。Renderの契約は不要です。`server.mjs` はローカル確認用のNode版として残しています。`render.yaml` は以前の有料構成で、無料版の公開には使いません。
 
 ## Instagram接続：Instagram Login方式
 
@@ -42,7 +40,7 @@ http://localhost:3000/ を開き、ADMIN_TOKENでログイン。投稿ID（数�
 
 - Instagram公式Private Repliesを使用：`POST /{IG_ACCOUNT_ID}/messages`、`recipient.comment_id` とプレーンテキストDM。ユーザーIDを宛先にした無差別DMは行いません。
 - 通常投稿/リールのコメントのみ。ライブ、ストーリー、広告、返信コメント、自己コメントは対象外（自己コメント判定に必要な情報がある場合）。
-- コメントIDを一意キーにして永続保存。署名を生データのHMAC-SHA256で確認し、対象アカウントと登録投稿も照合。WebhookはSQLiteへの保存後に応答し、5秒間隔で1件ずつ処理。
+- 無料版はD1、ローカルNode版はSQLiteでコメントIDを一意キーにして永続保存。署名を生データのHMAC-SHA256で確認し、対象アカウントと登録投稿も照合。WebhookはDB保存後に応答。無料版は毎分1件、ローカルNode版は5秒間隔で1件ずつ処理。
 - 明示的なレート制限/一時エラーは最大5試行。通信タイムアウトや送信途中の再起動は「要確認」にし、自動再送しない。Instagram側で確認してください。HTTP成功でもmessage_idが無い応答は成功扱いしません。
 - Metaの期限は通常コメントから7日。コメント時刻がWebhookにある場合は7日超を除外。時刻が無いときは受付時刻を使用し、サーバー内の待機は6日で打ち切ります。Metaが実際のコメント時刻で最終判定します。
 - 本機能からの私的返信はコメントに対して1通。追加の追客メッセージは実装していません。DMがメッセージリクエストに入る場合があります。
@@ -66,7 +64,7 @@ http://localhost:3000/ を開き、ADMIN_TOKENでログイン。投稿ID（数�
 - Instagramアカウント名、数字のアカウントID、APIバージョン、アクセストークン、Metaアプリシークレット、Webhook検証用トークン、確認モード/実送信モードを設定可能です。サーバー再起動は不要。アカウント名だけで認証はできません。
 - 1台のサーバーで一度に1アカウントを接続します。同時に複数アカウントを運用する機能ではありません。
 - 認証情報はAES-256-GCMで暗号化し永続DBに保存。設定APIは秘密値を返さず、設定済みかどうかだけを返します。空欄の秘密項目は既存値を維持します。アカウント変更時はすべて再入力します。
-- `SETTINGS_KEY` を暗号化鍵として使用します。Render Blueprintは自動生成。ローカルで未指定ならADMIN_TOKENを使用。保存後に鍵を変更すると復号できなくなるので、鍵を安全に保管・バックアップしてください。ADMIN_TOKENを変更する場合もSETTINGS_KEYは維持します。
+- `SETTINGS_KEY` を暗号化鍵として使用します。CloudflareではSecretとして設定します。ローカルで未指定ならADMIN_TOKENを使用。保存後に鍵を変更すると復号できなくなるので、鍵を安全に保管・バックアップしてください。ADMIN_TOKENを変更する場合もSETTINGS_KEYは維持します。
 - 接続設定の保存は全体OFF・待機ジョブ取消を伴います。アカウントID変更時は登録投稿設定も解除します。送信中は保存を拒否するため、数秒後に再度保存してください。
 - 「接続を確認」はアカウント情報取得の疎通確認だけです。Meta側の権限・Webhook購読・実DM配送は個別に確認が必要です。認証情報取得用のOAuthログイン画面は含みません。
-- Renderの初回登録、料金確認、サーバー公開は管理画面からは行えません。GitHubはコード保存先で、実行先はRender等のNodeサーバーです。
+- Cloudflareの初回登録とサーバー公開は管理画面からは行えません。GitHubはコード保存先で、無料版の実行先はCloudflare Workersです。
