@@ -45,7 +45,7 @@ test('uncertain delivery does not retry; explicit throttling retries; restart is
 });
 test('connection settings are encrypted, redacted, persisted and safely isolate account changes',async()=>{
  const dir=mkdtempSync(join(tmpdir(),'butai-settings-'));const env={ADMIN_TOKEN:'a'.repeat(40),SETTINGS_KEY:'stable-key',DATA_DIR:dir};
- const app=createApp(env,async()=>Response.json({id:'999',username:'butai'}));await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const url=`http://127.0.0.1:${app.server.address().port}`;
+ const app=createApp(env,async()=>Response.json({id:'different-scope',user_id:'999',username:'butai'}));await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const url=`http://127.0.0.1:${app.server.address().port}`;
  const auth={Authorization:`Bearer ${env.ADMIN_TOKEN}`};const api=async(path,body)=>{const r=await fetch(url+'/api/'+path,{method:body===undefined?'GET':'POST',headers:{...auth,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:r.status,data:await r.json()};};
  try{
  assert.equal((await fetch(url+'/api/connection')).status,401);

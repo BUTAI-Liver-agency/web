@@ -26,9 +26,12 @@ test('stale webhook settings cannot enqueue after an account revision change',as
 test('connection diagnostics distinguish Meta errors and ID mismatch without leaking raw responses',async()=>{
  const {e}=await setup();
  const check=async fetcher=>{const r=await createWorker(fetcher).fetch(request('/api/connection/check',{}),e);return {status:r.status,data:await r.json()};};
- const ok=await check(async()=>Response.json({id:'123',username:'butai'}));assert.equal(ok.status,200);assert.equal(ok.data.username,'butai');
+ const ok=await check(async url=>{assert.equal(new URL(url).pathname,'/v24.0/me');assert.equal(new URL(url).searchParams.get('fields'),'user_id,username');return Response.json({id:'39126884363622334',user_id:'123',username:'butai'});});assert.equal(ok.status,200);assert.equal(ok.data.username,'butai');
+ const wrapped=await check(async()=>Response.json({data:[{user_id:'123',username:'butai'}]}));assert.equal(wrapped.status,200);
+ const missing=await check(async()=>Response.json({id:'123',username:'butai'}));assert.equal(missing.status,502);
+ const ambiguous=await check(async()=>Response.json({data:[{user_id:'123'},{user_id:'999'}]}));assert.equal(ambiguous.status,502);
  const err=await check(async()=>Response.json({error:{code:190,error_subcode:463,message:'token-secret app-secret',fbtrace_id:'sensitive'}},{status:400}));assert.equal(err.status,502);assert.match(err.data.error,/HTTP 400.*code 190.*error_subcode 463/);assert.doesNotMatch(JSON.stringify(err),/token-secret|app-secret|sensitive/);
- const mismatch=await check(async()=>Response.json({id:'999',username:'other'}));assert.equal(mismatch.status,502);assert.match(mismatch.data.error,/設定：123.*API応答：999/);
+ const mismatch=await check(async()=>Response.json({id:'123',user_id:'999',username:'other'}));assert.equal(mismatch.status,502);assert.match(mismatch.data.error,/設定：123.*API応答：999/);
  const malformed=await check(async()=>new Response('token-secret',{status:502}));assert.equal(malformed.status,502);assert.match(malformed.data.error,/JSON形式以外/);assert.doesNotMatch(JSON.stringify(malformed),/token-secret/);
  const network=await check(async()=>{throw Error('token-secret');});assert.equal(network.status,502);assert.match(network.data.error,/通信エラー/);assert.doesNotMatch(JSON.stringify(network),/token-secret/);
  const denied=await createWorker(async()=>{assert.fail('unauthenticated request reached Meta');}).fetch(new Request('https://example.com/api/connection/check',{method:'POST'}),e);assert.equal(denied.status,401);
