@@ -79,7 +79,15 @@ export function createWorker(fetcher=fetch){return {
  if((p==='/api/media'&&request.method==='GET')||(p==='/api/connection/check'&&request.method==='POST')){
  if(!c.account||!c.token)return response(409,{error:'接続設定を先に保存してください'});
  const check=p.endsWith('/check');const u=new URL(`https://graph.instagram.com/${c.version}/${c.account}${check?'':'/media'}`);u.searchParams.set('fields',check?'id,username':'id,caption,media_type,permalink,timestamp');if(!check){u.searchParams.set('limit','25');const after=url.searchParams.get('after');if(after){if(after.length>2000)throw Error('カーソルを確認してください');u.searchParams.set('after',after);}}
- const r=await fetcher(u,{headers:{Authorization:`Bearer ${c.token}`},signal:AbortSignal.timeout(15000)});const data=await r.json();if(!r.ok||(check&&String(data.id)!==c.account))return response(502,{error:'InstagramのアカウントID・トークン・権限を確認してください'});return response(200,check?{ok:true,username:data.username||'',message:'アカウント取得に成功しました。Webhook購読とDM配送は別途確認してください'}:{data:data.data||[],after:data.paging?.next?data.paging.cursors?.after:null});
+ let r;try{r=await fetcher(u,{headers:{Authorization:`Bearer ${c.token}`},signal:AbortSignal.timeout(15000)});}catch{return response(502,{error:'Instagramへの接続に失敗しました（通信エラー）。時間を置いて接続を確認してください'});}
+ let data;try{data=await r.json();}catch{return response(502,{error:`InstagramからJSON形式以外の応答がありました（HTTP ${r.status}）。時間を置いて接続を確認してください`});}
+ if(!r.ok||data?.error){
+ // Only numeric diagnostics are returned. Meta messages can contain credentials or URLs.
+ const codes=[`HTTP ${r.status}`];for(const k of ['code','error_subcode'])if(Number.isSafeInteger(data?.error?.[k]))codes.push(`${k} ${data.error[k]}`);
+ return response(502,{error:`Instagram接続エラー（${codes.join(' / ')}）。アカウントID・トークン・権限を確認してください`});
+ }
+ if(check&&String(data?.id)!==c.account){const actual=/^\d{1,40}$/.test(String(data?.id))?String(data.id):'取得できません';return response(502,{error:`InstagramのアカウントIDが一致しません（設定：${c.account} / API応答：${actual}）。接続先を確認してください`});}
+ return response(200,check?{ok:true,username:data.username||'',message:'アカウント取得に成功しました。Webhook購読とDM配送は別途確認してください'}:{data:data.data||[],after:data.paging?.next?data.paging.cursors?.after:null});
  }
  return response(404,{error:'Not found'});
  }catch(error){

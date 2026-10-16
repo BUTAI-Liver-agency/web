@@ -1,5 +1,5 @@
 'use strict';
-const $=id=>document.getElementById(id);let token='',state={},after=null;const notice=t=>{$('notice').textContent=t;};
+const $=id=>document.getElementById(id);let token='',state={},after=null;const notice=t=>{const el=$('notice');el.textContent=t;el.setAttribute('role','status');el.scrollIntoView({behavior:'smooth',block:'center'});};
 async function api(path,body){const r=await fetch(`/api/${path}`,{method:body===undefined?'GET':'POST',headers:{Authorization:`Bearer ${token}`,...(body===undefined?{}:{'Content-Type':'application/json'})},...(body===undefined?{}:{body:JSON.stringify(body)})});const b=await r.json();if(!r.ok)throw Error(b.error||'処理できませんでした');return b;}
 const values=()=>({name:$('name').value,mediaId:$('mediaId').value,keywords:$('keywords').value.split('\n').map(s=>s.trim()).filter(Boolean),mode:$('mode').value,message:$('message').value,lineUrl:$('lineUrl').value,enabled:$('enabled').checked});
 function edit(c){for(const k of ['name','mediaId','mode','message','lineUrl'])$(k).value=c[k];$('keywords').value=c.keywords.join('\n');$('enabled').checked=c.enabled;$('campaignForm').scrollIntoView({behavior:'smooth',block:'start'});}
