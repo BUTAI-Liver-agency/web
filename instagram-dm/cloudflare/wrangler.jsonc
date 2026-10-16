@@ -13,7 +13,7 @@
   "d1_databases": [{
     "binding": "DB",
     "database_name": "butai-instagram-dm",
-    "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+    "database_id": "7d14cad1-1ac9-48cb-8095-478b2196cb9a",
     "migrations_dir": "migrations"
   }],
   "triggers": {"crons": ["* * * * *"]},
